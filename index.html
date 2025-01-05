@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Monitoring</title>
+    <style>
+        button { margin: 10px; padding: 10px; }
+        img { width: 80%; max-height: 300px; margin: 20px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>PC Monitoring Dashboard</h1>
+    <div id="user-buttons"></div>
+    <img id="screen" alt="Live Screen">
+    <script>
+        const API_URL = "http://192.168.7.16:5000/";
+
+        function updateStatus() {
+            fetch(`${API_URL}/status`)
+                .then(response => response.json())
+                .then(data => {
+                    const userButtons = document.getElementById('user-buttons');
+                    userButtons.innerHTML = '';
+                    for (let user in data) {
+                        const button = document.createElement('button');
+                        button.innerText = `${user} (${data[user].status})`;
+                        button.onclick = () => loadScreen(user);
+                        userButtons.appendChild(button);
+                    }
+                });
+        }
+
+        function loadScreen(user) {
+            document.getElementById('screen').src = `${API_URL}/get_screen/${user}?${Date.now()}`;
+        }
+
+        setInterval(updateStatus, 5000);
+        updateStatus();
+    </script>
+</body>
+</html>
